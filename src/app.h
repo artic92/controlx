@@ -134,7 +134,7 @@
  * @{
  */
 #define TOT_SENSING      20
-#define TOT_ACTUATING    15
+#define TOT_ACTUATING    10
 /* @} */
 
 /**

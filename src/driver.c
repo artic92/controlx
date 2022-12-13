@@ -233,11 +233,14 @@ int main (int argc, char* argv[])
    }
 
    // generate the actuator processes
-   pid = fork();
-   if (pid == 0)
+   for (i = 0; i < TOT_ACTUATORS; i++)
    {
-      actuate(ch_act, ID_ACT);
-      exit(EXIT_SUCCESS);
+      pid = fork();
+      if (pid == 0)
+      {
+         actuate(ch_act, i);
+         exit(EXIT_SUCCESS);
+      }
    }
 
    // generate the control process
@@ -256,20 +259,22 @@ int main (int argc, char* argv[])
       {
          perror("wait");
       }
+      fprintf(actual_log_file, "[%i] driver: process %i terminated with status %i...\n", getpid(), pid, status);
    }
 
-   fprintf(actual_log_file, "[%i] driver: all processes terminated, terminating voters and command...\n", getpid());
+   fprintf(actual_log_file, "[%i] driver: terminating voters and command...\n", getpid());
 
+   // TODO: fix this part
    // send the termination message to all stand-alone processes (control and voters)
    exit_msg.mtype = TERMINATE;
    exit_msg.mvalue = TERMINATE;
    channel_push_nonblock(ch_cmd, &exit_msg);
 
-   // TODO: fix this part
-   // if(wait(&status) == -1)
+   // if ((pid = wait(&status)) == -1)
    // {
    //    perror("wait");
    // }
+   // fprintf(actual_log_file, "[%i] driver: process %i terminated with status %i...\n", getpid(), pid, status);
 
    // do the same for the voters in case of TMR configuration
    if(enable_tmr)
@@ -304,42 +309,56 @@ PRIVATE void sense(channel_t* data_ch_tx, int id_sens, int id_replica, bool inje
 
    channel_create(data_ch_tx, data_ch_tx->seed);
 
-   if(inject_errors)
+   for (i = 0; i < TOT_SENSING; i++)
    {
-      switch (id_replica)
+      if(inject_errors)
       {
-      case 0:
-         srand('c');
-         data_msg.mvalue = (rand() % 1000);
-         fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
-         break;
-      case 1:
-         data_msg.mvalue = 999;
-         fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
-         break;
-      case 2:
-      default:
-         data_msg.mvalue = (rand() % 100);
-         break;
+         switch (id_replica)
+         {
+         case 0:
+            srand('c');
+            data_msg.mvalue = (rand() % 1000);
+            fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
+            break;
+         case 1:
+            data_msg.mvalue = 999;
+            fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
+            break;
+         case 2:
+         default:
+            data_msg.mvalue = (rand() % 100);
+            break;
+         }
       }
-   }
-   else
-   {
-      data_msg.mvalue = (rand() % 100);
-   }
-   sleep(rand() % 10);
+      else
+      {
+         data_msg.mvalue = (rand() % 100);
+      }
+      // simulate work
+      sleep(rand() % 10);
 
-   fprintf(stdout, "[%i] sensor %i/%i: generated data: type %li, value %i\n", getpid(), id_sens, id_replica, data_msg.mtype, data_msg.mvalue);
-   channel_push_nonblock(data_ch_tx, &data_msg);
+      fprintf(stdout, "[%i] sensor %i/%i: generated data: type %li, value %i\n",
+               getpid(), id_sens, id_replica, data_msg.mtype, data_msg.mvalue);
+      channel_push_nonblock(data_ch_tx, &data_msg);
+   }
 }
 
 PRIVATE void actuate(channel_t* data_ch_rx, int id_replica)
 {
+   int i;
    message_t data_msg;
 
    channel_create(data_ch_rx, CH2);
 
-   channel_retrieve_block(data_ch_rx, &data_msg);
-   fprintf(stdout, "[%i] actuator: received data: type %li, value %i \n", getpid(), data_msg.mtype, data_msg.mvalue);
-   sleep(rand() % 10);
+   for (i = 0; i < TOT_ACTUATING; i++)
+   {
+      fprintf(stdout, "[%i] actuator %i: waiting for data...\n",
+         getpid(), id_replica);
+
+      channel_retrieve_block(data_ch_rx, &data_msg);
+      fprintf(stdout, "[%i] actuator %i: received data: type %li, value %i\n",
+         getpid(), id_replica, data_msg.mtype, data_msg.mvalue);
+      // simulate work
+      sleep(rand() % 10);
+   }
 }
