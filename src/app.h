@@ -125,7 +125,16 @@
 #define TOT_GNSS        1
 #define TOT_STRTRK      1
 #define TOT_VOTERS      3
-#define TOT_ACTUATORS   1
+#define TOT_ACTUATORS   6
+/* @} */
+
+/**
+ * @name Dummy processes configuration
+ * @brief Configuration of the total number of acquisition and actuation
+ * @{
+ */
+#define TOT_SENSING      20
+#define TOT_ACTUATING    15
 /* @} */
 
 /**
