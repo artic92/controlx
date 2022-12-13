@@ -52,7 +52,7 @@ Mkfile.old
 dkms.conf
 
 # Executables
-bin/driver
+src/driver
 
 # Documentation
 doc/output

@@ -80,7 +80,7 @@ void vote(channel_t* cmd_ch, channel_t* data_ch_rx, channel_t* data_ch_tx, int i
    channel_create(data_ch_tx, CH1);
    channel_create(cmd_ch, CHCMD);
 
-   fprintf(stdout, "[%i] vote: waiting for messages...\n", getpid());
+   fprintf(stdout, "[%i] voter: waiting for messages...\n", getpid());
 
    while (true)
    {
