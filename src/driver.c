@@ -252,7 +252,7 @@ int main (int argc, char* argv[])
 
    for (i = 0; i < (tot_imu + tot_gnss + tot_strtrk + TOT_ACTUATORS); i++)
    {
-      while ((pid = wait(&status)) == -1)
+      if ((pid = wait(&status)) == -1)
       {
          perror("wait");
       }
@@ -265,10 +265,11 @@ int main (int argc, char* argv[])
    exit_msg.mvalue = TERMINATE;
    channel_push_nonblock(ch_cmd, &exit_msg);
 
-   if(wait(&status) == -1)
-   {
-      perror("wait");
-   }
+   // TODO: fix this part
+   // if(wait(&status) == -1)
+   // {
+   //    perror("wait");
+   // }
 
    // do the same for the voters in case of TMR configuration
    if(enable_tmr)
@@ -276,10 +277,11 @@ int main (int argc, char* argv[])
       for (i = 0; i < (tot_voters); i++)
       {
          channel_push_nonblock(ch_cmd, &exit_msg);
-         if(wait(&status) == -1)
-         {
-            perror("wait");
-         }
+         // TODO: fix this part
+         // if(wait(&status) == -1)
+         // {
+         //    perror("wait");
+         // }
       }
    }
 
