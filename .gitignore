@@ -56,3 +56,6 @@ src/driver
 
 # Documentation
 doc/output
+
+# IDE files
+.vscode/

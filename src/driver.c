@@ -19,6 +19,35 @@
 /***************************** Include Files ********************************/
 #include "app.h"
 
+/************************** Function Prototypes *****************************/
+/**
+* @brief Sensor code.
+*
+* @details Sends data to the GNC or to the voter (when in TMR more) at intervals
+*     that varies randomly between 0-10 seconds.
+*
+* @param[in] data_ch_tx   channel where the data is sent
+* @param[in] id_sens      class identifier according to @ref def_ids "this" classification
+* @param[in] id_replica   identifier of the replica in @ref sec_tmr_arch "TMR" configuration
+* @param[in] inject_errors when true the sensor injects faulty data
+*
+* @return none
+*/
+PRIVATE void sense(channel_t *data_ch_tx, int id_sens, int id_replica, bool inject_errors);
+
+/**
+* @brief Actuator code.
+*
+* @details Gets data from the GNC every time there is one available and simulates
+*     a random delay between 0-10 seconds.
+*
+* @param[in] data_ch_rx channel where the data is received
+* @param[in] id_replica identifier of the replica
+*
+* @return none
+*/
+PRIVATE void actuate(channel_t *data_ch_rx, int id_replica);
+
 /**
 *
 * @brief Creates the infrastructure showed in the \ref img_basic_arch "architecture" section
@@ -263,4 +292,52 @@ int main (int argc, char* argv[])
    close(log_fd);
 
    return EXIT_SUCCESS;
+}
+
+PRIVATE void sense(channel_t* data_ch_tx, int id_sens, int id_replica, bool inject_errors)
+{
+   u_int8_t i;
+   message_t data_msg;
+   data_msg.mtype = id_sens;
+
+   channel_create(data_ch_tx, data_ch_tx->seed);
+
+   if(inject_errors)
+   {
+      switch (id_replica)
+      {
+      case 0:
+         srand('c');
+         data_msg.mvalue = (rand() % 1000);
+         fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
+         break;
+      case 1:
+         data_msg.mvalue = 999;
+         fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
+         break;
+      case 2:
+      default:
+         data_msg.mvalue = (rand() % 100);
+         break;
+      }
+   }
+   else
+   {
+      data_msg.mvalue = (rand() % 100);
+   }
+   sleep(rand() % 10);
+
+   fprintf(stdout, "[%i] sensor %i/%i: generated data: type %li, value %i\n", getpid(), id_sens, id_replica, data_msg.mtype, data_msg.mvalue);
+   channel_push_nonblock(data_ch_tx, &data_msg);
+}
+
+PRIVATE void actuate(channel_t* data_ch_rx, int id_replica)
+{
+   message_t data_msg;
+
+   channel_create(data_ch_rx, CH2);
+
+   channel_retrieve_block(data_ch_rx, &data_msg);
+   fprintf(stdout, "[%i] actuator: received data: type %li, value %i \n", getpid(), data_msg.mtype, data_msg.mvalue);
+   sleep(rand() % 10);
 }

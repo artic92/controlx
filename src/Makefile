@@ -1,11 +1,11 @@
-driver: app.o driver.o channel.o control_law.o
-	@gcc -o driver app.o driver.o channel.o control_law.o
+driver: driver.o control.o channel.o control_law.o
+	@gcc -o driver driver.o control.o channel.o control_law.o
 
-driver.o: driver.c app.h
+driver.o: driver.c app.h channel.h control.h
 	@gcc -c -g driver.c
 
-app.o : app.c app.h control_law.h channel.h
-	@gcc -c -g app.c
+control.o: control.c channel.h control_law.h app.h
+	@gcc -c -g control.c
 
 channel.o: channel.c channel.h
 	@gcc -c -g channel.c

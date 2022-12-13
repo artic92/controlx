@@ -1,6 +1,6 @@
 /**
 * @file app.h
-* @brief Functions and data definitions for the demo app
+* @brief Definitions for the demo app
 * @anchor header_app
 * @author: Antonio Riccio
 * @copyright
@@ -17,8 +17,8 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *
 */
-#ifndef HEADER_H
-#define HEADER_H
+#ifndef APP_H
+#define APP_H
 
 /*! \mainpage
  *
@@ -113,7 +113,7 @@
 #include <string.h>
 
 #include "channel.h"
-#include "control_law.h"
+#include "control.h"
 
 /************************** Constant Definitions *****************************/
 /**
@@ -159,64 +159,9 @@
  */
 #define TERMINATE       10000
 
-/************************** Function Prototypes *****************************/
 /**
-* @brief Sensor code.
-*
-* @details Sends data to the GNC or to the voter (when in TMR more) at intervals
-*     that varies randomly between 0-10 seconds.
-*
-* @param[in] data_ch_tx   channel where the data is sent
-* @param[in] id_sens      class identifier according to @ref def_ids "this" classification
-* @param[in] id_replica   identifier of the replica in @ref sec_tmr_arch "TMR" configuration
-* @param[in] inject_errors when true the sensor injects faulty data
-*
-* @return none
-*/
-void sense(channel_t* data_ch_tx, int id_sens, int id_replica, bool inject_errors);
+ * @brief Mark the procedure with file visibility
+ */
+#define PRIVATE         static
 
-/**
-* @brief Actuator code.
-*
-* @details Gets data from the GNC every time there is one available and simulates
-*     a random delay between 0-10 seconds.
-*
-* @param[in] data_ch_rx channel where the data is received
-* @param[in] id_replica identifier of the replica
-*
-* @return none
-*/
-void actuate(channel_t* data_ch_rx, int id_replica);
-
-/**
-* @brief GNC code.
-*
-* @details Gets data from sensors or voter (for @ref sec_tmr_arch "TMR" configuration),
-*     elaborate then by applying the control law and sends them to actuators.
-*
-* @param[in] cmd_ch     service channel where commands are exchanged
-* @param[in] data_ch_rx channel where data is received
-* @param[in] data_ch_tx channel where data is transmitted
-*
-* @return none
-*/
-void control(channel_t* cmd_ch, channel_t* data_ch_rx, channel_t* data_ch_tx);
-
-/**
-* @brief Voter code.
-*
-* @details Implement 2-ou-of-3 voting when @ref sec_tmr_arch "TMR" is enabled.
-* @sa @ref driver_details "main()"
-* @note when no consensus cannot be reached, i.e. all three values are different, a default
-*     value of 0 is sent.
-*
-* @param[in] cmd_ch     service channel where commands are exchanged
-* @param[in] data_ch_rx channel where data is received
-* @param[in] data_ch_tx channel where data is transmitted
-* @param[in] id_sens    class identifier according to @ref def_ids "this" classification
-*
-* @return none
-*/
-void vote(channel_t* cmd_ch, channel_t* data_ch_rx, channel_t* data_ch_tx, int id_sens);
-
-# endif /*HEADER_H*/
+# endif /*APP_H*/

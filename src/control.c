@@ -1,6 +1,6 @@
 /**
-* @file app.c
-* @brief Functions implementation of @ref header_app "app.h".
+* @file control.c
+* @brief Functions implementation of @ref header_ctrl "control.h".
 * @author: Antonio Riccio
 * @copyright
 * Copyright 2022 Antonio Riccio <ariccio@protonmail.com>.
@@ -16,55 +16,7 @@
 * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 *
 */
-#include "app.h"
-
-void sense(channel_t* data_ch_tx, int id_sens, int id_replica, bool inject_errors)
-{
-   u_int8_t i;
-   message_t data_msg;
-   data_msg.mtype = id_sens;
-
-   channel_create(data_ch_tx, data_ch_tx->seed);
-
-   if(inject_errors)
-   {
-      switch (id_replica)
-      {
-      case 0:
-         srand('c');
-         data_msg.mvalue = (rand() % 1000);
-         fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
-         break;
-      case 1:
-         data_msg.mvalue = 999;
-         fprintf(stdout, "[%i] sensor %i/%i: stuck-at-N simulation\n", getpid(), id_sens, id_replica);
-         break;
-      case 2:
-      default:
-         data_msg.mvalue = (rand() % 100);
-         break;
-      }
-   }
-   else
-   {
-      data_msg.mvalue = (rand() % 100);
-   }
-   sleep(rand() % 10);
-
-   fprintf(stdout, "[%i] sensor %i/%i: generated data: type %li, value %i\n", getpid(), id_sens, id_replica, data_msg.mtype, data_msg.mvalue);
-   channel_push_nonblock(data_ch_tx, &data_msg);
-}
-
-void actuate(channel_t* data_ch_rx, int id_replica)
-{
-   message_t data_msg;
-
-   channel_create(data_ch_rx, CH2);
-
-   channel_retrieve_block(data_ch_rx, &data_msg);
-   fprintf(stdout, "[%i] actuator: received data: type %li, value %i \n", getpid(), data_msg.mtype, data_msg.mvalue);
-   sleep(rand() % 10);
-}
+#include "control.h"
 
 void control(channel_t* cmd_ch, channel_t* data_ch_rx, channel_t* data_ch_tx)
 {
