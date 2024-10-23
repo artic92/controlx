@@ -3,7 +3,7 @@
 * @brief Functions implementation of @ref header_ctrl "control.h".
 * @author: Antonio Riccio
 * @copyright
-* Copyright 2022 Antonio Riccio <ariccio@protonmail.com>.
+* Copyright 2022 Antonio Riccio <hi@ariccio.me>.
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as
 * published by the Free Software Foundation; either version 3 of

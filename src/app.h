@@ -4,7 +4,7 @@
 * @anchor header_app
 * @author: Antonio Riccio
 * @copyright
-* Copyright 2022 Antonio Riccio <ariccio@protonmail.com>.
+* Copyright 2022 Antonio Riccio <hi@ariccio.me>.
 * This program is free software; you can redistribute it and/or
 * modify it under the terms of the GNU General Public License as
 * published by the Free Software Foundation; either version 3 of
@@ -24,7 +24,7 @@
  *
  * \section intro_sec Introduction
  *
- * This project represent the challenge from the Exploration Company for the hiring campaign in 2022.
+ * ControlX is a C-based framework for sensor data processing and control in spacecraft systems. It simulates interactions between sensors and actuators, including fault tolerance mechanisms such as Triple Modular Redundancy (TMR).
  *
  * \section intro_overview Overview
  *
@@ -85,7 +85,7 @@
  * To generate the documentation:
  *
  * 1. cd doc/
- * 2. doxygen gen_doc_cfg
+ * 2. doxygen generate_doc
  *
  * Open the HTML version with any type of browser. In case of firefox:
  *
